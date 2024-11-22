@@ -10,18 +10,18 @@ nchnls = 1           ; Number of channels (mono)
 0dbfs = 1            ; Full scale for audio signals
 
 instr 1
-    ; Generate the C Minor 7th chord
-    a1 oscils 0.3, 261.63, 0   ; C (Middle C, 261.63 Hz)
-    a2 oscils 0.3, 311.13, 0   ; E♭ (311.13 Hz)
-    a3 oscils 0.3, 392.00, 0   ; G (392.00 Hz)
-    a4 oscils 0.3, 466.16, 0   ; B♭ (466.16 Hz)
-    out a1 + a2 + a3 + a4      ; Mix all the notes together
+    ; Generate a sine wave for the note
+    a1 oscils 0.3, p4, 0       ; Amplitude = 0.3, Frequency = p4 (passed from score)
+    out a1                    ; Output the sine wave
 endin
 </CsInstruments>
 <CsScore>
-; Schedule the chord
-; p1 (instrument), p2 (start time), p3 (duration)
-i1 0 5                      ; Play instrument 1 for 5 seconds
-e                           ; End of score
+; Schedule each note with slight offsets for humanization
+; p1 (instrument), p2 (start time), p3 (duration), p4 (frequency)
+i1 0.0 2 261.63               ; C (Middle C, starts immediately)
+i1 0.05 2 311.13              ; E♭ (starts 50 ms later)
+i1 0.10 2 392.00              ; G (starts 100 ms later)
+i1 0.15 2 466.16              ; B♭ (starts 150 ms later)
+e                             ; End of score
 </CsScore>
 </CsoundSynthesizer>

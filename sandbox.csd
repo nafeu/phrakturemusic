@@ -1,27 +1,42 @@
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-o output.wav -W
 </CsOptions>
 <CsInstruments>
-; Define the orchestra
 sr = 44100           ; Sample rate
 ksmps = 32           ; Control rate (number of samples per control period)
-nchnls = 1           ; Number of channels (mono)
+nchnls = 2           ; Number of channels (stereo)
 0dbfs = 1            ; Full scale for audio signals
 
 instr 1
-    ; Generate a sine wave for the note
-    a1 oscils 0.3, p4, 0       ; Amplitude = 0.3, Frequency = p4 (passed from score)
-    out a1                    ; Output the sine wave
+    ; Base frequency and note frequency
+    iBaseFreq = 261.63           ; Middle C frequency (C4)
+    iNoteFreq = p4               ; Frequency of the desired note (passed via p4)
+
+    ; Ratio for pitch-shifting
+    kRatio = iNoteFreq / iBaseFreq
+
+    ; Play the sample with pitch-shifting
+    aLeft, aRight diskin2 "piano.wav", kRatio, 0, 1
+
+    ; Mix the dry signal
+    aDryLeft = aLeft
+    aDryRight = aRight
+
+    ; Apply reverb (reverbsc)
+    aWetLeft, aWetRight reverbsc aLeft, aRight, 0.85, 12000
+
+    ; Mix wet and dry signals
+    outs aDryLeft * 0.7 + aWetLeft * 0.3, aDryRight * 0.7 + aWetRight * 0.3
 endin
 </CsInstruments>
 <CsScore>
-; Schedule each note with slight offsets for humanization
+; Play the C Minor 7th chord with each note as a separate event
 ; p1 (instrument), p2 (start time), p3 (duration), p4 (frequency)
-i1 0.0 2 261.63               ; C (Middle C, starts immediately)
-i1 0.05 2 311.13              ; E♭ (starts 50 ms later)
-i1 0.10 2 392.00              ; G (starts 100 ms later)
-i1 0.15 2 466.16              ; B♭ (starts 150 ms later)
-e                             ; End of score
+i1 0.0 2 261.63      ; C (Middle C)
+i1 0.05 2 311.13     ; E♭
+i1 0.10 2 392.00     ; G
+i1 0.15 2 466.16     ; B♭
+e                    ; End of score
 </CsScore>
 </CsoundSynthesizer>
